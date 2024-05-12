@@ -1,75 +1,83 @@
-# Kredi Başvuru Değerlendirme Uygulaması
+# Credit Scoring CNN Project with XAI
 
-Bu uygulama, kullanıcıların kredi başvurularını değerlendirmek için bir arayüz sunar. Kullanıcılar, belirli kredi başvurusu parametrelerini girdikten sonra, uygulama bu bilgilere dayanarak başvurunun onaylanıp onaylanmayacağını tahmin eder.
+This project implements a Convolutional Neural Network (CNN) for credit scoring predictions. The model is built using PyTorch and explains predictions using Captum and SHAP to enhance transparency and interpretability in machine learning.
 
-## Nasıl Çalışır?
+## Project Structure
 
-Bu uygulama, Python programlama dili kullanılarak geliştirilmiştir ve aşağıdaki bileşenleri içerir:
+- **credit_cnn.py**: Training script for the CNN model.
+- **explain_cnn.py**: Script to explain the predictions using Captum and SHAP.
+- **credit_scoring.csv**: Dataset for training the model.
+- **test.csv**: Dataset for making predictions and explanations.
+- **best_model.pth**: Saved model with the best validation accuracy.
+- **label_encoders.pkl**: Saved LabelEncoder objects for categorical features.
+- **scaler.pkl**: Saved StandardScaler object for numerical features.
 
-1. **Veri Ön İşleme ve Model Eğitimi:** Uygulama, bir `RandomForestClassifier` kullanarak kredi başvurusu verilerini değerlendirmek için bir makine öğrenimi modeli eğitir. Veri ön işleme adımları arasında eksik veri doldurma, kategorik değişkenleri kodlama ve veri kümesini eğitim ve test setlerine ayırma bulunmaktadır. Model, [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/index.php) üzerinde bulunan Almanya kredi veri seti kullanılarak eğitilmiştir.
+## Setup Instructions
 
-2. **GUI (Grafiksel Kullanıcı Arayüzü):** Tkinter kütüphanesi kullanılarak basit bir grafiksel kullanıcı arayüzü oluşturulmuştur. Kullanıcılar, kredi başvurusu ile ilgili bilgileri girebilir ve ardından uygulama, bu bilgilere dayanarak kredi başvurusunun onaylanıp onaylanmayacağını tahmin eder.
-
-## Kurulum
-
-1. Bu projeyi klonlayın veya ZIP dosyası olarak indirin:
-
-    ```
-    git clone https://github.com/kullanici/kredi-basvuru-degerlendirme.git
-    ```
-
-2. Python 3.6 veya daha yeni bir sürümü yükleyin.
-
-3. Gerekli Python kütüphanelerini yükleyin:
-
-    ```
-    pip install pandas scikit-learn
+1. **Clone the Repository**:
+    ```bash
+    git clone https://github.com/mehmetuzunyayla/xplain.git
+    cd xplain
     ```
 
-4. Uygulamayı çalıştırın:
-
+2. **Install Dependencies**:
+    ```bash
+    pip install -r requirements.txt
     ```
-    python kredi_basvuru_degerlendirme.py
+
+3. **Prepare the Data**:
+    - Ensure `credit_scoring.csv` is in the project directory for training.
+    - Ensure `test.csv` is in the project directory for testing and explanation.
+
+4. **Training the Model**:
+    ```bash
+    python credit_cnn.py
     ```
 
-## Kullanım
+5. **Explaining Predictions**:
+    ```bash
+    python explain_cnn.py
+    ```
 
-1. Uygulama başlatıldığında, bir kullanıcı arayüzü görüntülenir.
-2. Kullanıcılar, çeşitli kredi başvurusu parametrelerini girmek için metin kutularını kullanabilir.
-3. "Gönder" düğmesine tıkladıktan sonra, uygulama kredi başvurusunun onaylanıp onaylanmayacağını tahmin eder ve sonucu ekranda gösterir.
+## Model Architecture
 
-## Örnek Girdiler
+The CNN model consists of:
+- Three convolutional layers with Batch Normalization and LeakyReLU activation.
+- One dropout layer to prevent overfitting.
+- Two fully connected layers.
 
-Bu uygulama, kullanıcıların kredi başvurularını değerlendirmek için çeşitli parametreler sağlamasını gerektirir. İşte örnek girdi değerleri:
+## Explanation Techniques
 
-- **Mevcut Hesap Durumu:** A11
-- **Kredi Süresi (Ay):** 24
-- **Kredi Geçmişi:** A30
-- **Kredi Amaç:** A40
-- **Kredi Miktarı:** 4000
-- **Tasarruf Hesabı:** A65
-- **İş Süresi:** A75
-- **Taksit Oranı:** 4
-- **Kişisel Durum/Cinsiyet:** A93
-- **Diğer Borçlu Durumu:** A101
-- **Mevcut Oturum Süresi (Yıl):** 4
-- **Mülk Tipi:** A121
-- **Yaş:** 35
-- **Diğer Taksit Planları:** A143
-- **Konut Durumu:** A151
-- **Mevcut Kredi Sayısı:** 2
-- **Meslek Durumu:** A171
-- **Yükümlü Kişi Sayısı:** 1
-- **Telefon Durumu:** A191
-- **Yabancı İşçi Durumu:** A201
+- **Captum IntegratedGradients**: To calculate feature attributions.
+- **SHAP GradientExplainer**: To provide additional insights into feature contributions.
 
-Bu değerleri girdikten sonra "Gönder" düğmesine tıklayarak tahmini alabilirsiniz.
+## Example Usage
 
-## Dikkat Edilmesi Gerekenler
+- **Training Output**:
+    ```
+    Epoch 1: Loss: 0.7796, Val Loss: 0.5990, Val Accuracy: 69.67%
+    Saving new best model with accuracy: 69.67%
+    ...
+    Test Accuracy: 76.00%
+    ```
 
-- Kullanıcılar, doğru bilgileri girmelidir çünkü tahminler bu bilgilere dayanır.
-- Veri setindeki kategorik değerler, belirli bir kodlama düzenine sahiptir. Kullanıcıların bu kodlama düzenini takip etmeleri önemlidir.
-- Uygulamanın sunduğu tahminler, sadece bir tahmindir ve kesin sonuçlar garanti edilmez.
+- **Explanation Output**:
+    ```
+    Enter the index of the row you want to explain: 56
+    Name  Contribution  Causal Effects
+    0    checking_status   -0.115669    0.623556
+    ...
+    Predicted class: 0
+    ```
 
-Bu örnek girdiler, kullanıcıların uygulamayı nasıl kullanacaklarını anlamalarına yardımcı olabilir ve doğru girdileri nasıl sağlayacaklarını gösterebilir.
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+
+## Acknowledgments
+
+- [PyTorch](https://pytorch.org/)
+- [Captum](https://captum.ai/)
+- [SHAP](https://github.com/slundberg/shap)
 
